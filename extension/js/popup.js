@@ -180,11 +180,23 @@ export function update_cmd(e) {
     if (ext === 'mp4') {
       cmd.value = `${options.ffmpeg_command} ${inputs
         .map((url) => `-i "${url}"`)
-        .join(' ')} -c:v copy -c:a copy -bsf:a aac_adtstoasc "${output_path}"`;
+        .join(' ')} ${mapOutputToNumber(inputs)}  ${maybeAddMovText(
+        inputs,
+      )} -c:v copy -c:a copy -bsf:a aac_adtstoasc "${output_path}"`;
     } else {
       cmd.value = `${options.ffmpeg_command} ${inputs
         .map((url) => `-i "${url}"`)
-        .join(' ')} -c:v copy -c:a copy "${output_path}"`;
+        .join(' ')} ${mapOutputToNumber(
+        inputs,
+      )} -c:v copy -c:a copy "${output_path}"`;
+    }
+    function maybeAddMovText(array) {
+      return array.length > 2 ? '-c:s mov_text' : '';
+    }
+    function mapOutputToNumber(array) {
+      return array.length > 2
+        ? array.map((_value, index) => `-map ${index}`).join(' ')
+        : '';
     }
   }
   cmd.setAttribute('data-url', url);
